@@ -6,7 +6,6 @@ import authRoutes from "./express/routes/auth";
 const envPath = `./src/.env.${process.env.NODE_ENV}`.concat(
   process.env.LOCAL ? ".local" : ""
 );
-// console.log(envPath);
 dotenv.config({ path: envPath });
 
 const app = express();

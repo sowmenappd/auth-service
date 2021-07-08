@@ -44,23 +44,30 @@ export const signUpValidators = [
       credentials.password.length >= 6,
   },
   {
-    message: "Email cannot be empty.",
+    message: "User information not provided.",
     statusCode: 400,
     validate: (credentials: UserSignUpRequestDto) =>
-      !!credentials.userInformation?.email,
+      !!credentials.userInformation,
   },
   {
-    message: "First name cannot be empty.",
+    message:
+      "Email must be provided and length must be of at least 3 characters.",
     statusCode: 400,
     validate: (credentials: UserSignUpRequestDto) =>
-      !!credentials.userInformation?.first_name &&
-      credentials.userInformation.first_name.length > 2,
+      credentials.userInformation.email?.length > 2,
   },
   {
-    message: "Last name cannot be empty.",
+    message:
+      "First name must be provided and length must be of at least 3 characters.",
     statusCode: 400,
     validate: (credentials: UserSignUpRequestDto) =>
-      !!credentials.userInformation?.last_name &&
-      credentials.userInformation.last_name.length > 2,
+      credentials.userInformation.first_name?.length > 2,
+  },
+  {
+    message:
+      "Last name must be provided and length must be of at least 3 characters.",
+    statusCode: 400,
+    validate: (credentials: UserSignUpRequestDto) =>
+      credentials.userInformation?.last_name?.length > 2,
   },
 ];
