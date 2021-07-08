@@ -63,13 +63,6 @@ export default class AuthenticationService {
 
   public async signUp(userSignupObject: UserSignUpRequestDto) {
     try {
-      // pre-auth validation
-      for (let validator of signUpValidators) {
-        if (!validator.validate(userSignupObject)) {
-          return makeRejectedPromise(validator.message, validator.statusCode);
-        }
-      }
-
       const targetUser = await this.userRepository.findOne(
         userSignupObject.username
       );
@@ -78,6 +71,13 @@ export default class AuthenticationService {
           "User with credentials already exists.",
           409
         );
+      }
+
+      // pre-auth validation
+      for (let validator of signUpValidators) {
+        if (!validator.validate(userSignupObject)) {
+          return makeRejectedPromise(validator.message, validator.statusCode);
+        }
       }
 
       // assert server secret is defined
