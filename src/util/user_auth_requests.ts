@@ -6,5 +6,9 @@ export type UserSignInRequestDto = {
 export type UserSignUpRequestDto = {
   username: string;
   password: string;
-  userInformation: any;
+  userInformation: {
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 };

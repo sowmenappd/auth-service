@@ -2,32 +2,14 @@ import IRepository from "../interfaces/IRepository";
 import {
   comparePasswords,
   createJwtToken,
-  generateHash,
   generateSaltAndHash,
 } from "../util/authentication";
 import { makeRejectedPromise } from "../util/errors";
-import { UserSignInRequestDto } from "../util/user_auth_requests";
-
-const validators = [
-  {
-    message: "Username must be valid.",
-    statusCode: 400,
-    validate: (credentials: UserSignInRequestDto) =>
-      credentials.username !== null,
-  },
-  {
-    message: "Password must be valid.",
-    statusCode: 400,
-    validate: (credentials: UserSignInRequestDto) =>
-      credentials.password !== null,
-  },
-  {
-    message: "Password must be at least 6 characters in length.",
-    statusCode: 400,
-    validate: (credentials: UserSignInRequestDto) =>
-      credentials.password.length >= 6,
-  },
-];
+import {
+  UserSignInRequestDto,
+  UserSignUpRequestDto,
+} from "../util/user_auth_requests";
+import { signInValidators, signUpValidators } from "../util/validators";
 
 export default class AuthenticationService {
   constructor(private userRepository: IRepository) {}
@@ -35,16 +17,15 @@ export default class AuthenticationService {
   public async signIn(userSignInObject: UserSignInRequestDto) {
     try {
       // pre-auth validation
-      for (let validator of validators) {
+      for (let validator of signInValidators) {
         if (!validator.validate(userSignInObject)) {
-          return Promise.reject({
-            message: validator.message,
-            statusCode: validator.statusCode,
-          });
+          return makeRejectedPromise(validator.message, validator.statusCode);
         }
       }
 
-      const targetUser = this.userRepository.findOne(userSignInObject.username);
+      const targetUser = await this.userRepository.findOne(
+        userSignInObject.username
+      );
       if (!targetUser) {
         return makeRejectedPromise(
           "User with credentials doesn't not exist.",
@@ -76,7 +57,50 @@ export default class AuthenticationService {
       }
       return makeRejectedPromise("Invalid user credentials.", 401);
     } catch (err) {
-      return makeRejectedPromise("Invalid user credentials.", 401);
+      return makeRejectedPromise("Invalid request.", 400);
+    }
+  }
+
+  public async signUp(userSignupObject: UserSignUpRequestDto) {
+    try {
+      // pre-auth validation
+      for (let validator of signUpValidators) {
+        if (!validator.validate(userSignupObject)) {
+          return makeRejectedPromise(validator.message, validator.statusCode);
+        }
+      }
+
+      const targetUser = await this.userRepository.findOne(
+        userSignupObject.username
+      );
+      if (targetUser) {
+        return makeRejectedPromise(
+          "User with credentials already exists.",
+          409
+        );
+      }
+
+      // assert server secret is defined
+      const jwt_secret: string = process.env.JWT_SECRET || "";
+      if (!jwt_secret) {
+        return makeRejectedPromise("Internal server error.", 500);
+      }
+
+      const { salt, hash } = await generateSaltAndHash(
+        userSignupObject.password
+      );
+      await this.userRepository.create(userSignupObject.username, {
+        ...userSignupObject,
+        salt,
+        hash,
+      });
+
+      return Promise.resolve({
+        statusCode: 200,
+        message: "User created successfully.",
+      });
+    } catch (err) {
+      return makeRejectedPromise(err.message, 400);
     }
   }
 }

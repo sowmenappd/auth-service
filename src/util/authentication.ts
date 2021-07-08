@@ -12,7 +12,9 @@ export const generateHash = async (password: string, salt: string) => {
   return hash;
 };
 
-export const generateSaltAndHash = async (password: string) => {
+export const generateSaltAndHash = async (
+  password: string
+): Promise<{ salt: string; hash: string }> => {
   const salt = await bcrypt.genSalt(14);
   const hash = await bcrypt.hash(password, salt);
 
