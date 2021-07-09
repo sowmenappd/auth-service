@@ -6,7 +6,7 @@ import AuthenticationController from "../../controllers/AuthenticationController
 import PostgresUsersRepository from "../../interfaces/PostgresUsersRepository";
 // import FakeUsersRepository from "../../interfaces/FakeUsersRepository";
 
-// const fakeUsersRepo = new FakeUsersRepository(users);
+// const fakeUsersRepo = new FakeUsersRepository();
 
 const pgUsersRepo = new PostgresUsersRepository();
 const usersService = new AuthenticationService(pgUsersRepo);

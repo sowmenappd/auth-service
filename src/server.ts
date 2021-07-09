@@ -1,8 +1,9 @@
 import express from "express";
+import config from "./config";
 import authRoutes from "./express/routes/auth";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

@@ -1,7 +1,8 @@
+import { IUser } from "../entities/IUser";
 import IRepository from "./IRepository";
 
-export default class FakeUsersRepository implements IRepository {
-  private database: any[];
+export default class FakeUsersRepository implements IRepository<IUser> {
+  private database: IUser[];
 
   constructor() {
     this.database = [
@@ -20,20 +21,18 @@ export default class FakeUsersRepository implements IRepository {
     ];
   }
 
-  async findOne(id: string) {
-    const user = this.database.find(
-      (user: { username: string }) => user.username === id
-    );
+  async findOne(id: string): Promise<IUser | undefined> {
+    const user = this.database.find((user: IUser) => user.username === id);
     return user;
   }
 
-  async findMany(ids: string[]) {
-    return this.database.filter((user: { username: string }) => {
+  async findMany(ids: string[]): Promise<IUser[] | undefined> {
+    return this.database.filter((user: IUser) => {
       return ids.findIndex((id) => id === user.username) !== -1;
     });
   }
 
-  async create(id: string, entry: any) {
+  async create(id: string, entry: IUser) {
     this.database.push(entry);
   }
 

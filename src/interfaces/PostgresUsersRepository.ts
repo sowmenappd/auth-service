@@ -1,8 +1,9 @@
 import config from "../config";
 import pg from "pg";
 import IRepository from "./IRepository";
+import { IUser } from "../entities/IUser";
 
-export default class PostgresUsersRepository implements IRepository {
+export default class PostgresUsersRepository implements IRepository<IUser> {
   private client: pg.Client;
 
   constructor() {
@@ -24,17 +25,18 @@ export default class PostgresUsersRepository implements IRepository {
       .catch((err) => console.log(err.message));
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<IUser | undefined> {
     const query = "SELECT * FROM users WHERE username = $1";
     const res = await this.client.query(query, [id]);
     if (res.rowCount > 0) {
-      return res.rows[0];
+      return res.rows[0] as IUser;
     }
-    return null;
+    return undefined;
   }
 
-  async findMany(ids: string[]) {
-    throw new Error("Method not implemented.");
+  async findMany(ids: string[]): Promise<IUser[] | undefined> {
+    // TODO: implement method
+    return undefined;
   }
 
   async create(id: string, entry: any) {

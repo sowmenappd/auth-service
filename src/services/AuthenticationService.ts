@@ -1,3 +1,4 @@
+import { IUser } from "../entities/IUser";
 import IRepository from "../interfaces/IRepository";
 import {
   comparePasswords,
@@ -12,7 +13,7 @@ import {
 import { signInValidators, signUpValidators } from "../util/validators";
 
 export default class AuthenticationService {
-  constructor(private userRepository: IRepository) {}
+  constructor(private userRepository: IRepository<IUser>) {}
 
   public async signIn(userSignInObject: UserSignInRequestDto) {
     try {
